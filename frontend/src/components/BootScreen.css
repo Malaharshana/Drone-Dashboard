@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+.boot-screen {
+  background-color: black;
+  color: #00ffe0;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.2rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 5vw;
+  overflow: hidden;
+}
+
+.boot-line {
+  position: relative;
+  margin-bottom: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  width: fit-content;
+  border-right: 2px solid #00ffe0;
+  animation: typing 1.4s steps(40, end), blink 0.75s step-end infinite;
+  text-shadow: 0 0 8px cyan;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  top: 0;
+}
+
+.glitch::before {
+  animation: glitchTop 1.5s infinite linear alternate-reverse;
+  color: #0ff8;
+  z-index: -1;
+}
+
+.glitch::after {
+  animation: glitchBottom 1.5s infinite linear alternate-reverse;
+  color: #f0f8;
+  z-index: -1;
+}
+
+@keyframes glitchTop {
+  0% { clip: rect(0, 9999px, 0, 0); }
+  50% { clip: rect(0, 9999px, 100%, 0); transform: translateX(-2px); }
+  100% { clip: rect(0, 9999px, 0, 0); }
+}
+
+@keyframes glitchBottom {
+  0% { clip: rect(0, 9999px, 0, 0); }
+  50% { clip: rect(0, 9999px, 100%, 0); transform: translateX(2px); }
+  100% { clip: rect(0, 9999px, 0, 0); }
+}

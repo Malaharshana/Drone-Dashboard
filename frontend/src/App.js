@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Home from './pages/Home';
+import BootScreen from './components/BootScreen';
 
+// Dark theme definition
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -21,13 +23,24 @@ const darkTheme = createTheme({
   },
 });
 
-const App = () => {
+// Main App component
+function App() {
+  const [showBoot, setShowBoot] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowBoot(false);
+    }, 3000); // 3 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Home />
+      {showBoot ? <BootScreen /> : <Home />}
     </ThemeProvider>
   );
-};
+}
 
 export default App;
