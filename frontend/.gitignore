@@ -1,0 +1,31 @@
+# Python virtual environment
+venv/
+.env
+*.env
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# VSCode / JetBrains / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Jupyter Notebooks checkpoint files
+.ipynb_checkpoints
+
+# Test coverage / build
+htmlcov/
+.coverage
+.tox/
+dist/
+build/
+*.egg-info

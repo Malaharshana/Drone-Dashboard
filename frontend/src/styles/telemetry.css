@@ -1,0 +1,31 @@
+.circular-progress-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .circular-progress-wrapper .CircularProgressbar-text {
+    dominant-baseline: middle;
+    dominant-baseline: middle;
+    transform: translateY(-5%);
+  }
+  
+  /* Applies to all telemetry text inside cards */
+.telemetry-card-content {
+    line-height: 1.6;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    font-family: 'Orbitron', sans-serif; /* Optional: use a sci-fi styled font */
+    color: #ffffffcc;
+  }
+  
+  /* For CircularProgressbar text */
+  .circular-progress-wrapper .CircularProgressbar-text {
+    dominant-baseline: middle;
+    alignment-baseline: middle;
+    transform: translateY(-5%);
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+  
