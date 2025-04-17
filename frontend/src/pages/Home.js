@@ -4,6 +4,10 @@ import TopBar from '../components/TopBar';
 import TelemetryPanel from '../components/TelemetryPanel';
 import MapView from '../components/MapView';
 import { subscribeToTelemetry } from '../api/socket';
+import { speakAlert, stopAlert } from '../utils/voiceAlert';
+import { useTheme } from '@mui/material/styles';
+import BatteryFullIcon from '@mui/icons-material/BatteryFull';
+
 
 const Home = () => {
   const [telemetry, setTelemetry] = useState(null);
@@ -69,6 +73,19 @@ const Home = () => {
       setAlerts(newAlerts);
       lastGps.current = incoming.gps;
       lastYaw.current = incoming.yaw;
+      // Voice Alerts
+      if (newAlerts.battery && incoming.battery < 4) {
+          speakAlert("Battery low");
+      } else if (!newAlerts.battery) {
+        stopAlert();
+      }
+
+      if (newAlerts.connection && incoming.connection !== 'Excellent') {
+        speakAlert("Connection lost");
+      } else if (!newAlerts.connection) {
+        stopAlert();
+      }
+
     });
 
     return () => unsubscribe();

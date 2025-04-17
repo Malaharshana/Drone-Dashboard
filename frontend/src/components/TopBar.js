@@ -1,6 +1,6 @@
 // src/components/TopBar.js
-import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Typography, Chip, Stack } from '@mui/material';
+import React, { useEffect, useState, useRef } from 'react';
+import { AppBar, Toolbar, Typography, Chip, Stack, Box } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
@@ -25,8 +25,25 @@ const TopBar = ({ telemetry }) => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
+  
+  const batteryAlertRef = useRef(false);
 
   const battery = telemetry?.battery;
+  useEffect(() => {
+    if (battery < 4 && !batteryAlertRef.current) {
+      batteryAlertRef.current = true;
+      const utterance = new SpeechSynthesisUtterance('Battery level critical');
+      speechSynthesis.speak(utterance);
+    }
+
+    if (battery >= 4 && batteryAlertRef.current) {
+      batteryAlertRef.current = false;
+      speechSynthesis.cancel(); // Stop any ongoing speech
+    }
+  }, [battery]);
+
+
+
   const connection = telemetry?.connection;
   const gps = telemetry?.gps;
 
@@ -46,7 +63,6 @@ const TopBar = ({ telemetry }) => {
           sx={{
             fontWeight: 'bold',
             textShadow: '0 0 2px cyan',
-            
           }}
         >
           DRONE DASHBOARD
@@ -54,17 +70,35 @@ const TopBar = ({ telemetry }) => {
 
         <Stack direction="row" spacing={2} alignItems="center">
           {/* Battery */}
-          <Chip
-            icon={<BatteryFullIcon />}
-            label={`${battery ? ((battery / 12) * 100).toFixed(0) : 0}%`}
-            color={getBatteryColor(battery)}
-            variant="outlined"
-            sx={{
-              borderColor: '#00f2ff',
-              color: 'white',
-              '&:hover': { boxShadow: '0 0 8px #0ff' },
-            }}
-          />
+          <Box>
+            <Chip
+              icon={<BatteryFullIcon />}
+              label={`${battery ? ((battery / 12) * 100).toFixed(0) : 0}%`}
+              color={getBatteryColor(battery)}
+              variant="outlined"
+              sx={{
+                backgroundColor: battery < 4 ? '#ff1744' : undefined,
+                color: battery < 4 ? 'white' : undefined,
+                fontWeight: 'bold',
+                borderColor: battery < 4 ? '#ff1744' : '#00f2ff',
+                '&:hover': { boxShadow: '0 0 8px #ff1744' },
+              }}
+            />
+            {battery < 4 && (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'red',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  display: 'block',
+                  mt: 0.5,
+                }}
+              >
+                Battery Low!
+              </Typography>
+            )}
+          </Box>
 
           {/* GPS */}
           <Chip
