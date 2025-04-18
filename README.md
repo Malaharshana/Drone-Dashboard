@@ -167,5 +167,4 @@ DRONETELEMETRYDASHBOARD/
 ## 👨‍💻 Author
 
 **Malaharshana A P**  
-🔗 [GitHub](https://github.com/Malaharshana)  
 📧 24l162@psgitech.ac.in

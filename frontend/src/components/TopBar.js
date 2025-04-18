@@ -6,6 +6,15 @@ import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 
+if (typeof window !== 'undefined') {
+  window.addEventListener('click', () => {
+    const u = new SpeechSynthesisUtterance('');
+    u.volume = 0;
+    speechSynthesis.speak(u);
+  }, { once: true });
+}
+
+
 const getBatteryColor = (battery) => {
   if (battery < 3.7) return 'error';
   if (battery < 7) return 'warning';
@@ -18,18 +27,39 @@ const getSignalColor = (connection) => {
   return 'error';
 };
 
-const TopBar = ({ telemetry }) => {
+const TopBar = ({ telemetry, telemetryReady }) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
-  
-  const batteryAlertRef = useRef(false);
-
-  const battery = telemetry?.battery;
   useEffect(() => {
+    const initVoices = () => {
+      const utterance = new SpeechSynthesisUtterance('');
+      utterance.volume = 0;
+      speechSynthesis.speak(utterance);
+    };
+  
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      if (speechSynthesis.getVoices().length === 0) {
+        speechSynthesis.onvoiceschanged = initVoices;
+      } else {
+        initVoices();
+      }
+    }
+  }, []);
+  
+  const battery = telemetry?.battery;
+  const connection = telemetry?.connection;
+  const gps = telemetry?.gps;
+
+  const batteryAlertRef = useRef(false);
+  const connectionAlertRef = useRef(false);
+
+  useEffect(() => {
+    if (!telemetryReady) return; // Don't speak until ready
+
     if (battery < 4 && !batteryAlertRef.current) {
       batteryAlertRef.current = true;
       const utterance = new SpeechSynthesisUtterance('Battery level critical');
@@ -38,14 +68,20 @@ const TopBar = ({ telemetry }) => {
 
     if (battery >= 4 && batteryAlertRef.current) {
       batteryAlertRef.current = false;
-      speechSynthesis.cancel(); // Stop any ongoing speech
+      speechSynthesis.cancel();
     }
-  }, [battery]);
 
+    if (connection === 'No Signal' && !connectionAlertRef.current) {
+      connectionAlertRef.current = true;
+      const utterance = new SpeechSynthesisUtterance('Connection lost');
+      speechSynthesis.speak(utterance);
+    }
 
-
-  const connection = telemetry?.connection;
-  const gps = telemetry?.gps;
+    if (connection !== 'No Signal' && connectionAlertRef.current) {
+      connectionAlertRef.current = false;
+      speechSynthesis.cancel();
+    }
+  }, [battery, connection, telemetryReady]);
 
   return (
     <AppBar
@@ -104,9 +140,7 @@ const TopBar = ({ telemetry }) => {
           <Chip
             icon={<GpsFixedIcon />}
             label={
-              gps
-                ? `${gps.lat.toFixed(2)}, ${gps.lon.toFixed(2)}`
-                : 'No GPS'
+              gps ? `${gps.lat.toFixed(2)}, ${gps.lon.toFixed(2)}` : 'No GPS'
             }
             color="info"
             variant="outlined"

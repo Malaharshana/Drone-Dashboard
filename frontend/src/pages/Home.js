@@ -1,16 +1,15 @@
+// src/pages/Home.js
 import React, { useEffect, useState, useRef } from 'react';
 import { Box, Typography, Chip, Card, CardContent } from '@mui/material';
 import TopBar from '../components/TopBar';
 import TelemetryPanel from '../components/TelemetryPanel';
 import MapView from '../components/MapView';
 import { subscribeToTelemetry } from '../api/socket';
-import { speakAlert, stopAlert } from '../utils/voiceAlert';
-import { useTheme } from '@mui/material/styles';
-import BatteryFullIcon from '@mui/icons-material/BatteryFull';
-
 
 const Home = () => {
   const [telemetry, setTelemetry] = useState(null);
+  const [telemetryReady, setTelemetryReady] = useState(false);
+
   const [alerts, setAlerts] = useState({
     battery: null,
     gps: null,
@@ -27,6 +26,34 @@ const Home = () => {
   const lastYaw = useRef(null);
   const lastYawChangeTime = useRef(Date.now());
 
+  const batteryAlertRef = useRef(false);
+  const connectionAlertRef = useRef(false);
+
+  const speak = (text) => {
+    if (!window.speechSynthesis) return;
+    
+    const speakAttempt = (triesLeft) => {
+      if (triesLeft === 0) return;
+  
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+  
+      // Retry if not speaking
+      utterance.onend = () => {
+        // Successful
+      };
+  
+      utterance.onerror = () => {
+        setTimeout(() => speakAttempt(triesLeft - 1), 200);
+      };
+  
+      window.speechSynthesis.speak(utterance);
+    };
+  
+    speakAttempt(3); // Try up to 3 times
+  };
   const hasGpsFrozen = (current) => {
     if (!lastGps.current) return false;
     return (
@@ -49,8 +76,13 @@ const Home = () => {
   };
 
   useEffect(() => {
+    const dummy = new SpeechSynthesisUtterance('Initialising voice system');
+    dummy.volume = 0;
+
+    window.speechSynthesis.speak(dummy);
     const unsubscribe = subscribeToTelemetry((incoming) => {
       setTelemetry(incoming);
+      setTelemetryReady(true);
       const time = new Date().toLocaleTimeString();
 
       setBatteryHistory((prev) => [...prev.slice(-20), { time, value: incoming.battery }]);
@@ -63,29 +95,34 @@ const Home = () => {
         yaw: incoming.yaw,
       }]);
 
+      // Voice Alerts
+      if (incoming.battery < 4 && !batteryAlertRef.current) {
+        batteryAlertRef.current = true;
+        speak("Battery level critical.");
+      }
+      if (incoming.battery >= 4 && batteryAlertRef.current) {
+        batteryAlertRef.current = false;
+      }
+
+      if (incoming.connection === "No Signal" && !connectionAlertRef.current) {
+        connectionAlertRef.current = true;
+        speak("Connection lost.");
+      }
+      if (incoming.connection !== "No Signal" && connectionAlertRef.current) {
+        connectionAlertRef.current = false;
+      }
+
+      // Alerts UI
       const newAlerts = {
-        battery: incoming.battery < 3.7 ? '⚠️ Battery Critical!' : null,
+        battery: incoming.battery < 3.7 ? '⚠ Battery Critical!' : null,
         gps: hasGpsFrozen(incoming.gps) ? '📡 Lost Signal: GPS Frozen' : null,
-        imu: isYawErratic(incoming.yaw) ? '⚠️ Instability Detected' : null,
+        imu: isYawErratic(incoming.yaw) ? '⚠ Instability Detected' : null,
         connection: incoming.connection === 'No Signal' ? '🚫 Connection Lost!' : null,
       };
 
       setAlerts(newAlerts);
       lastGps.current = incoming.gps;
       lastYaw.current = incoming.yaw;
-      // Voice Alerts
-      if (newAlerts.battery && incoming.battery < 4) {
-          speakAlert("Battery low");
-      } else if (!newAlerts.battery) {
-        stopAlert();
-      }
-
-      if (newAlerts.connection && incoming.connection !== 'Excellent') {
-        speakAlert("Connection lost");
-      } else if (!newAlerts.connection) {
-        stopAlert();
-      }
-
     });
 
     return () => unsubscribe();
@@ -100,20 +137,19 @@ const Home = () => {
 
   return (
     <Box sx={{ backgroundColor: '#0f172a', height: '100vh', overflow: 'hidden' }}>
-      <TopBar telemetry={telemetry} />
+      <TopBar telemetry={telemetry} telemetryReady={telemetryReady} />
       <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)' }}>
-        {/* Left Panel */}
         <Box sx={{ width: '750px', overflowY: 'auto', borderRight: '1px solid #1e293b' }}>
           <TelemetryPanel telemetry={telemetry} chartData={chartData} alerts={alerts} />
         </Box>
 
-        {/* Right Panel */}
         <Box sx={{ flexGrow: 2, p: 5, overflowY: 'auto' }}>
-          <Typography variant="h5" sx={{ mb: 2, color: 'white' }}>🗺 DRONE NAVIGATION AND TRACKING</Typography>
+          <Typography variant="h5" sx={{ mb: 2, color: 'white' }}>
+            🗺 DRONE NAVIGATION AND TRACKING
+          </Typography>
 
           {telemetry && (
             <>
-              {/* Connection Status */}
               <Card
                 sx={{
                   background: 'rgba(0, 0, 0, 0.8)',
@@ -159,7 +195,6 @@ const Home = () => {
                 </CardContent>
               </Card>
 
-              {/* GPS Info */}
               <Card
                 sx={{
                   background: 'rgba(0, 0, 0, 0.8)',
