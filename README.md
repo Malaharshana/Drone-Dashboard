@@ -1,6 +1,6 @@
 # 🛰️ Drone Command HQ – Real-time Drone Telemetry Dashboard
 
-A sci-fi themed, fully immersive web-based dashboard that simulates **real-time drone telemetry**. Designed with cinematic animations, glassmorphism UI, and mission control aesthetics, this dashboard is perfect for showcasing drone data in a stunning, futuristic way.
+A **sci-fi themed, fully immersive web-based dashboard** that simulates real-time drone telemetry. Designed with cinematic animations, glassmorphism UI, and mission control aesthetics, this dashboard is perfect for showcasing drone data in a stunning, futuristic way.
 
 ---
 
@@ -12,21 +12,33 @@ A sci-fi themed, fully immersive web-based dashboard that simulates **real-time 
 - Custom drone icons with rotation support
 
 ### 📊 Telemetry Dashboard (UI Cards)
-- **Animated Circular Gauges** for:
+- Animated Circular Gauges for:
   - Battery
   - Altitude
   - Temperature
   - IMU (Roll, Pitch, Yaw)
-- **Live Line Graphs** synced with the gauges
-- **Sci-fi Styling** with neon/glassmorphism effects
+- Live Line Graphs synced with the gauges
+- Sci-fi Styling with neon/glassmorphism effects
 
 ### ✨ Framer Motion Animations
 - Cinematic dashboard boot-up sequence
 - Smooth transitions between interface elements
 - Subtle motion and hover effects for a tactile feel
 
+### 🔔 System Health Alerts
+- **Battery Critical** – Visual alert when voltage < 4V  
+- **GPS Signal Lost** – Displays "No Signal" with flashing status  
+- **IMU Instability** – Detected from high fluctuations in Roll/Pitch/Yaw  
+- Alerts visually appear **inside telemetry cards** with cinematic glitches
+
+### 🔊 Voice Alerts (In-Browser)
+- Voice synthesis warns for:
+  - **Low Battery**
+  - **Lost Connection**
+- Seamlessly integrated into the dashboard without interrupting visuals
+
 ### 🧪 Frontend-Based Data Simulation
-- Uses **mocked/randomized data** (no backend needed to run)
+- Uses mocked/randomized data (no backend needed to run)
 - Easily extendable to real hardware via WebSocket endpoint
 
 ### 🧭 Top Bar with Live Status Display
@@ -40,6 +52,73 @@ A sci-fi themed, fully immersive web-based dashboard that simulates **real-time 
 - Adaptive layouts for desktops, tablets, and mobiles
 - Dark mode with glowing edges, soft shadows, and neon gradients
 - Inspired by futuristic mission control systems
+
+---
+
+
+## 🧠 Simulated Telemetry Data
+
+The **Python FastAPI backend** streams the following telemetry values via WebSocket in real-time:
+
+| Parameter     | Description                             |
+|---------------|-----------------------------------------|
+| `battery`     | Voltage (0–12V)                         |
+| `temperature` | Temperature in °C                       |
+| `imu`         | Roll, Pitch, Yaw angles (°)             |
+| `altitude`    | Altitude in meters                      |
+| `gps`         | Latitude, Longitude, Altitude           |
+| `connection`  | Signal strength: Excellent / Poor / None|
+
+---
+
+## ✅ Evaluation Checklist
+
+✔️ Real-time updates using WebSocket  
+✔️ Gauges + Graphs + Maps  
+✔️ Animation, boot-up sound, and themed transitions  
+✔️ Fully responsive layout  
+✔️ Clear, creative, immersive UI  
+✔️ No hardware dependency  
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Malaharshana/Drone-Dashboard.git
+cd DRONETELEMETRYDASHBOARD
+```
+
+### 2. Run the Frontend (React + Vite)
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Runs at: [http://localhost:3000](http://localhost:3000)
+
+### 3. Run the Backend (FastAPI)
+
+```bash
+cd backend
+pip install fastapi uvicorn
+uvicorn main:app --reload --port 8000
+```
+
+Runs at: [http://localhost:8000](http://localhost:8000)
+
+---
+
+## 🔌 WebSocket Endpoint
+
+- **Endpoint:** `/telemetry/ws`  
+- **Protocol:** WebSocket  
+- **Used in:** `frontend/src/api/socket.js`  
+- Streams battery, GPS, IMU, temperature, altitude, and connection data in real-time to frontend
 
 ---
 
@@ -69,68 +148,24 @@ DRONETELEMETRYDASHBOARD/
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/Malaharshana/Drone-Dashboard.git
-cd DRONETELEMETRYDASHBOARD
-```
-
-### 2. Run the Frontend (React)
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-> Frontend will run at: [http://localhost:3000](http://localhost:3000)
-
-### 3. Run the Backend (FastAPI)
-
-```bash
-cd backend
-pip install fastapi uvicorn
-uvicorn main:app --reload --port 8000
-```
-
-> Backend will run at: [http://localhost:8000](http://localhost:8000)
-
----
-
-## 🔌 WebSocket Endpoint
-
-- **`/telemetry/ws`**
-  - Type: WebSocket
-  - Sends: Battery, GPS, IMU, Altitude, and Connection data in real-time
-  - Used in frontend via `src/api/socket.js`
-
----
-
-## 📸 Screenshots
-
-> _Drop your screenshots into a folder like `frontend/public/screenshots/` and use these links:_
-
-```
-![Dashboard UI](./frontend/public/screenshots/dashboard.png)
-![Live Map](./frontend/public/screenshots/map.png)
-```
-
----
-
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, Material UI, Framer Motion, MUI, Vite, Leaflet
-- **Backend (optional)**: Python, FastAPI, Uvicorn
-
-- **Communication**: WebSocket
+| Layer      | Tech Used                                           |
+|------------|-----------------------------------------------------|
+| **Frontend** | React, Vite, Material UI (MUI), Leaflet, Framer Motion |
+| **Backend**  | Python, FastAPI, Uvicorn                           |
+| **Communication** | WebSocket                                   |
 
 ---
 
 ## 📽 Demo Video
 
-> _Coming soon: Add your YouTube/Loom demo link here_
+🎬 Coming soon: Add your YouTube / Loom / Drive demo link here.
 
 ---
+
+## 👨‍💻 Author
+
+**Malaharshana A P**  
+🔗 [GitHub](https://github.com/Malaharshana)  
+📧 24l162@psgitech.ac.in
