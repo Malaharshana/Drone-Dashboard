@@ -67,7 +67,7 @@ The **Python FastAPI backend** streams the following telemetry values via WebSoc
 | `imu`         | Roll, Pitch, Yaw angles (°)             |
 | `altitude`    | Altitude in meters                      |
 | `gps`         | Latitude, Longitude, Altitude           |
-| `connection`  | Signal strength: Excellent / Poor / None|
+| `connection`  | Signal strength: Excellent / Poor / No Signal|
 
 ---
 
