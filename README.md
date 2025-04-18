@@ -160,7 +160,7 @@ DRONETELEMETRYDASHBOARD/
 
 ## 📽 Demo Video
 
-🎬 Coming soon: Add your YouTube / Loom / Drive demo link here.
+https://drive.google.com/file/d/1oYGTiQ6vLucXYQHzcR4Jk9Njf4XtQK18/view?usp=sharing
 
 ---
 
